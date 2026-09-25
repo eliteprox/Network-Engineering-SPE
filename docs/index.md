@@ -16,6 +16,9 @@ catalog. Cloud SPE work status and dependency ordering live in Beads (`bd ready`
 - [Capability and gap inventory](design-docs/console-capability-and-gap-matrix.md)
   — pinned implementation evidence, preserved Console/Batteries source map,
   MCP behavior, new homes and unverified integration gaps.
+- [Integration contract drafts](design-docs/index.md)
+  — gateway routes, MCP tools, enterprise authorization, usage export,
+  Clearinghouse flags, and provisioning modes, listed in the design index.
 - [Repository architecture](../ARCHITECTURE.md) — boundaries, information model,
   and source precedence.
 - [Core beliefs](design-docs/core-beliefs.md) — principles for shaping the SPE
