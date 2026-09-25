@@ -28,6 +28,9 @@ catalog. Cloud SPE work status and dependency ordering live in Beads (`bd ready`
   — Mike Zupper's 45 delivery tasks (six planning and 39 implementation) with single milestones, proposed repository homes,
   acceptance criteria, dependencies, and a crosswalk to the implementation source tasks;
   mirrored as project drafts, with upstream handoffs kept separate.
+- [Integration contract drafts](design-docs/index.md)
+  — gateway routes, MCP tools, enterprise authorization, usage export,
+  Clearinghouse flags, and provisioning modes, listed in the design index.
 - [Repository architecture](../ARCHITECTURE.md) — boundaries, information model,
   and source precedence.
 - [Core beliefs](design-docs/core-beliefs.md) — principles for shaping the SPE

@@ -91,6 +91,8 @@ through milestone execution. Individual enterprises decide when to adopt the eng
 Detailed component flows are in the
 [diagram companion](open-builder-architecture-and-sequences.md); implementation
 evidence and gaps are in the [capability matrix](console-capability-and-gap-matrix.md).
+Integration contracts for review are indexed with the
+[design documents](index.md).
 
 ## Selected direction
 
@@ -202,7 +204,9 @@ Customer login tokens do not need to reach the payment provider. Keep configured
 service payment credentials separate from engine/user access, and correlate
 opaque job/attempt/payment references. Per-application versus per-actor payment
 allocations remain a contract decision; onboarding a customer need not create a
-provider account or allocation for that customer.
+provider account or allocation for that customer. The
+[provisioning draft](payment-provisioning-modes.md#wholesale-accounting-model)
+recommends one wholesale allocation per enterprise for review.
 
 ## Execution scope
 
