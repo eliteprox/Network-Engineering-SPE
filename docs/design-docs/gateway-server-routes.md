@@ -4,7 +4,7 @@
 **Updated:** 25 September 2026
 **Context:** [Self-sovereign open builder stack](self-sovereign-open-builder-stack-draft.md), [capability matrix](console-capability-and-gap-matrix.md)
 
-This draft specifies the HTTP surface of a proposed `livepeer-python-gateway-server` package built on `livepeer/livepeer-python-gateway`. REST and MCP call the same core. The package holds the remote-signer URL, discovery URL, and Clearinghouse allocation API key in server configuration. Caller credentials stop at the access adapter described in the [authorization draft](enterprise-authorization-server.md).
+This draft specifies the HTTP surface of a proposed `livepeer-python-gateway-server` package built on `livepeer/livepeer-python-gateway`. REST and MCP call the same core. The package holds the remote-signer URL and discovery URL. Caller credentials stop at the access adapter described in the [authorization draft](enterprise-authorization-server.md). The Clearinghouse allocation API key is never a field on public requests. Enterprise mode loads it from the authorization-server vault after the access token is verified. Standalone mode keeps it in server configuration.
 
 No Cloud SPE decision record accepts this contract yet.
 
@@ -40,15 +40,15 @@ Persistent Live Runner sessions use trickle or websocket media. Those sessions a
 
 Upload storage, asset libraries, retail prices, invoices, grant administration, and the signer authorization webhook are outside this surface. Provisioning lives in the [provisioning draft](payment-provisioning-modes.md) and is not part of these routes. Usage rows on `GET /v1/usage` are the engine projection defined in the [usage export draft](usage-event-export.md).
 
-The Daydream SDK service can select a signer and a discovery URL from a per-key validate response. This server uses the signer URL, discovery URL, and allocation key from its own configuration. Per-key signer selection is a hosted-product behavior and stays out of this contract.
+The Daydream SDK service can select a signer and a discovery URL from a per-key validate response. This server uses the signer URL and discovery URL from its own configuration. The allocation key comes from the vault in enterprise mode and from server configuration in standalone mode. Per-key signer selection is a hosted-product behavior and stays out of this contract.
 
 ## Decisions
 
 - Capability identity in URLs is the query parameter `name`, because advertised names contain a slash.
 - Invocation is Live Runner through the Python SDK. The server package is the process boundary that replaces `gateway-web`.
 - Persistent media has its own HTTP routes. Job polling stays on `GET /v1/jobs/{id}`.
-- The allocation API key is configuration, not a field on public requests.
+- The allocation API key is not a field on public requests. Enterprise mode resolves it from the authorization-server vault. Standalone mode keeps it in server configuration.
 
 ## Work this design implies
 
-A later roadmap bead should break out the route handlers, the idempotent job record, the query-parameter capability lookup, and one streaming route as separate stories. Acceptance is a pinned Live Runner capability exercised through `POST /v1/jobs` and `GET /v1/jobs/{id}`, with a name that contains a slash resolved only through `name=`.
+`netspe-cz5.7` is the JSON routes, the idempotent job record, the query-parameter capability lookup, and one proxied Live Runner job. `netspe-cz5.9` is one streaming route. `GET /v1/usage` may show pending rows joined on `manifest_id` before the export topic exists.

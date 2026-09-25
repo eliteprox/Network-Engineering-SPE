@@ -17,10 +17,10 @@ status is `Accepted` and it links to the decision that approved it.
 | [September–December milestone proposal](cloud-spe-september-december-2026-milestones-draft.md) | Historical; superseded by accepted M1–M5 plan | Input to later October–December milestone revision |
 | [Gateway server routes](gateway-server-routes.md) | Draft for review | Live Runner HTTP surface, slash-safe capability names, streaming routes |
 | [MCP tooling](mcp-tooling.md) | Draft for review | Core tools shared with the gateway routes; extension tools and media streams |
-| [Enterprise authorization server](enterprise-authorization-server.md) | Draft for review | Pluggable issuer, three credentials, and the invocation sequence |
+| [Enterprise authorization server](enterprise-authorization-server.md) | Draft for review | Pluggable issuer, public MCP OAuth, and a user-scoped vault for the allocation key |
 | [Usage event export](usage-event-export.md) | Draft for review | CloudEvents export topic and OpenMeter, Lago, and Kill Bill connectors |
 | [Clearinghouse configuration](clearinghouse-configuration.md) | Draft for review | Current serve flags and the optional usage export topic |
-| [Payment provisioning modes](payment-provisioning-modes.md) | Draft for review | Wholesale allocation per enterprise, CLI and hosted provisioning, open funding gap |
+| [Payment provisioning modes](payment-provisioning-modes.md) | Draft for review | Wholesale allocation per enterprise, CLI-seeded vault, external admin HTTP for programmatic fund |
 
 Intermediate Console-replacement and enterprise deployment drafts were removed
 on 23 September after consolidation. Original stakeholder evidence and its chronology remain in the
@@ -31,5 +31,5 @@ Historical `-draft` filenames remain for link stability. GitHub Project 13 track
 public milestones; Beads tracks internal work.
 The six integration drafts dated 25 September 2026 are review material for the
 gateway, MCP, authorization, usage export, Clearinghouse flags, and
-provisioning. A feature roadmap is derived from them after review. No draft
+provisioning. Feature and story order lives in Beads under `netspe-cz5`. No draft
 becomes accepted by being linked. Work state remains in Beads.

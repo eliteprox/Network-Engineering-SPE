@@ -28,7 +28,7 @@ Configuration precedence is flags, then environment, then the configuration file
 
 The webhook stays on loopback unless a TLS proxy terminates in front of it, matching Batteries `SECURITY.md`. Kafka stays on a trusted network. Plaintext broker connections are an operator concern, not an enterprise API.
 
-Management of grants, allocations, keys, sessions, usage, ledger, settlement, and escrow remains the CLI. `usage list` returns id, event id, topic, offset, status, error, fee, and created time. Pipeline, request id, session, billable seconds, and pixels stay in the table and are omitted from that CLI view. Enterprises use the export topic in the [usage draft](usage-event-export.md) rather than polling this database or this CLI.
+Management of grants, allocations, keys, sessions, usage, ledger, settlement, and escrow remains the CLI. The maintainer's admin HTTP server is not a `serve` flag and is not part of the export-topic ask. `usage list` returns id, event id, topic, offset, status, error, fee, and created time. Pipeline, request id, session, billable seconds, and pixels stay in the table and are omitted from that CLI view. Enterprises use the export topic in the [usage draft](usage-event-export.md) rather than polling this database or this CLI.
 
 ## Export topic
 
@@ -44,9 +44,9 @@ Funding idempotency is a separate maintainer ask. Today each fund operation mint
 
 ## Modes and flags
 
-Standalone, self-operated enterprise, and hosted payment deployments use this same flag set. The gateway's access-adapter mode, signer URL, discovery URL, and allocation key are gateway configuration. They are not Batteries flags.
+Standalone, self-operated enterprise, and hosted payment deployments use this same flag set. The gateway's access-adapter mode, signer URL, and discovery URL are gateway configuration. The allocation key is a vault secret on the authorization server in enterprise mode, or gateway configuration in standalone mode. They are not Batteries flags.
 
-Hard spending reservation, a public management HTTP API, and an outbox table are out of this flag change. The export topic is the outbound path. Authorization continues to check a positive available balance and does not reserve the next ticket.
+Hard spending reservation, a public management HTTP API, and an outbox table are out of this flag change. Programmatic grant and allocation management waits on the maintainer's admin HTTP server and is not requested here. The export topic is the outbound path. Authorization continues to check a positive available balance and does not reserve the next ticket.
 
 ## Decisions
 
@@ -57,4 +57,4 @@ Hard spending reservation, a public management HTTP API, and an outbox table are
 
 ## Work this design implies
 
-A later roadmap bead should treat the export flag as an upstream patch with a maintainer review, and should leave every other flag unchanged. Acceptance is a `serve` process that applies an event to the ledger and, only when the flag is set, publishes one CloudEvent, with quarantined events absent from that topic.
+`netspe-cz5.11` is the upstream `--usage-export-topic` patch. It waits on maintainer agreement. It does not wait on the admin HTTP server. Every other `serve` flag stays unchanged.

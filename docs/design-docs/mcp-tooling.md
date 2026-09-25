@@ -50,4 +50,4 @@ The MCP resource publishes protected-resource metadata as described in the [auth
 
 ## Work this design implies
 
-A later roadmap bead should treat the six core tools as one story tied to the route handlers, and the streaming-versus-MCP question as a separate spike with a named client and a named persistent capability.
+`netspe-cz5.8` is the six core tools tied to the route handlers. `netspe-cz5.10` is the streaming-versus-MCP spike with a named client and a named persistent capability.

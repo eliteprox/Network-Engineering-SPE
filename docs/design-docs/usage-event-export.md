@@ -59,4 +59,4 @@ OpenMeter can accept the canonical CloudEvent with a subject mapping. Lago and K
 
 ## Work this design implies
 
-A later roadmap bead should split the export-topic publish (maintainer agreement), the CloudEvent schema fixture, and one reference connector. The first connector should be OpenMeter HTTP ingest, because that sink already speaks CloudEvents. Lago and Kill Bill adapters are separate stories. Acceptance includes a duplicate delivery that bills once, a quarantined signer event that produces no export, two allocations with different `enterprise_id` values landing on different subjects, and an exported event whose `manifest_id` matches the engine attempt that caused it.
+`netspe-cz5.11` is the export-topic publish and waits on maintainer agreement, not on the admin HTTP server. `netspe-cz5.12` is the CloudEvent schema fixture. `netspe-cz5.13` is the OpenMeter HTTP ingest connector. `netspe-cz5.14` and `netspe-cz5.15` are the Lago and Kill Bill adapters.

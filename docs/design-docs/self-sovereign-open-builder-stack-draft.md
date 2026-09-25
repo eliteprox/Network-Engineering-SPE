@@ -188,8 +188,11 @@ trusted authentication layer; provider/admin credentials stay server-side.
 Recommend operator-issued scoped API keys as the standalone REST/remote-MCP
 baseline, with opaque actor identifiers, revocation, ownership isolation and a
 separate administrator credential. Enterprise authentication supplies the same
-validated access context through a supported adapter. Google login and MCP OAuth
-can be demonstrated in the example without becoming mandatory core identity
+validated access context through a supported adapter, then loads the
+Clearinghouse allocation key from a user-scoped vault on the authorization
+server so MCP clients stay public OAuth clients. The contract is in the
+[authorization draft](enterprise-authorization-server.md). Google login and MCP
+OAuth can be demonstrated in the example without becoming mandatory core identity
 infrastructure. This recommendation has not yet been explicitly selected by Mike.
 
 Claude Code, Codex CLI and OpenCode document header/bearer credentials and OAuth:
@@ -206,7 +209,8 @@ opaque job/attempt/payment references. Per-application versus per-actor payment
 allocations remain a contract decision; onboarding a customer need not create a
 provider account or allocation for that customer. The
 [provisioning draft](payment-provisioning-modes.md#wholesale-accounting-model)
-recommends one wholesale allocation per enterprise for review.
+recommends one wholesale allocation per enterprise while the CLI is the only
+provisioner, with the allocation key held in the authorization-server vault.
 
 ## Execution scope
 
@@ -315,5 +319,8 @@ and repository placement, execution-process packaging, representative acceptance
 capabilities, supported deployment guarantees, service-assurance and recourse
 boundaries, ongoing owners, the funded acceptance environment and final-release
 acceptance procedure. The meeting evidence does not establish Inc adoption or
-obligate Josh/John to particular upstream changes. Preserve these distinctions
-during milestone execution. Resolve decisions before accepting dependent work.
+obligate Josh/John to particular upstream changes. The authorization and
+provisioning drafts recommend public MCP OAuth, a user-scoped vault for the
+Clearinghouse API key, and an external admin HTTP server for programmatic
+funding; those remain review material until this boundary is decided. Preserve
+these distinctions during milestone execution. Resolve decisions before accepting dependent work.
