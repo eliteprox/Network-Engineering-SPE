@@ -1,8 +1,8 @@
 # Enterprise Authorization Server
 
 **Status:** Draft for review
-**Updated:** 25 September 2026
-**Context:** [Gateway server routes](gateway-server-routes.md), [MCP tooling](mcp-tooling.md), [provisioning modes](payment-provisioning-modes.md)
+**Updated:** 1 October 2026
+**Context:** [Gateway server routes](gateway-server-routes.md), [MCP tooling](mcp-tooling.md), [provisioning modes](payment-provisioning-modes.md), [authentication provider modes](enterprise-auth-provider-modes.md)
 
 The gateway is an OAuth 2.0 protected resource. The enterprise app's authentication server is the issuer. Clearinghouse Batteries is not that server. It authenticates the remote signer and the allocation API key only.
 
@@ -31,7 +31,7 @@ Enterprise mode follows the shape already implemented by Console's MCP metadata,
 - [RFC 8707](https://www.rfc-editor.org/rfc/rfc8707) resource indicator equal to the gateway MCP or API resource.
 - Access tokens whose `iss` is the enterprise app's authentication server. The gateway verifies issuer, audience, expiry, and resource against that server's JWKS, then maps `sub` to the opaque actor.
 
-MCP clients stay public OAuth clients. Registration is the MCP URL and a browser login. Device-code grant stays out of the core server unless a pinned Claude client requires it.
+MCP clients stay public OAuth clients. Registration is the MCP URL and a browser login. This sequence is mode 5 of the [authentication provider modes](enterprise-auth-provider-modes.md). Device authorization, token exchange, HTTP Basic and local-gateway login are optional provider modules described there, not part of this core sequence.
 
 The enterprise app's authentication server publishes this metadata and PKCE flow, mints the access token, and publishes its own issuer and JWKS. After the gateway verifies the token, it loads the allocation key from the vault.
 
@@ -39,7 +39,7 @@ The enterprise app's authentication server publishes this metadata and PKCE flow
 
 The enterprise app's authentication server already holds credentials. It stores each Clearinghouse `lpg_` key as a vault secret named by the user's `sub`. After the access adapter accepts the token, the gateway reads that secret and places it on the signer request. The access token is dropped.
 
-Until the Batteries maintainer publishes an admin HTTP server, an operator creates the grant, allocation, and key with the CLI and installs the one-time secret in the vault. The resolver is user-scoped from the start. Every `sub` may resolve to that one key. Rotation is a second key on the same allocation, a vault swap, then revoke of the old key.
+The engine's `BatteriesProvider` creates the allocation and key through the Batteries management API and writes the one-time secret into the vault ([management integration](batteries-management-integration.md#phase-a-single-tenant-reseller)). An operator may instead use the CLI on the Batteries host and install the secret by hand. The resolver is user-scoped from the start. Every `sub` may resolve to that one key. Rotation is a second key on the same allocation, a vault swap, then revoke of the old key.
 
 A later JWKS-per-grant check inside Batteries remains a recommendation. It is not this sequence.
 
@@ -89,7 +89,7 @@ A normal Clearinghouse decision is HTTP 200 with a JSON `status` of 200, 401, 40
 
 ## Allocations and actors
 
-Each enterprise uses one wholesale Clearinghouse allocation while provisioning is CLI-only. Clearinghouse stores no end-user records, and the opaque actor never reaches it. An end-user allowance is an entitlement in the enterprise store. The gateway checks that entitlement before it calls the SDK and enforces per-user limits while metered work runs. Clearinghouse enforces only the budget on the key that the vault selected. Creating a Clearinghouse allocation per end user waits on the maintainer's admin HTTP server. A grant remains a customer budget, not a user record. Details are in the [provisioning draft](payment-provisioning-modes.md#wholesale-accounting-model).
+Each enterprise starts with one wholesale Clearinghouse grant and engine-managed allocations. Clearinghouse stores no end-user records, and the opaque actor never reaches it. An end-user allowance is an entitlement in the enterprise store. The gateway checks that entitlement before it calls the SDK and enforces per-user limits while metered work runs. Clearinghouse enforces only the budget on the key that the vault selected. A Clearinghouse allocation per end user or device is possible through the management API and belongs to the [multi-tenant phase](batteries-management-integration.md#phase-b-multi-tenant). A grant remains a customer budget, not a user record. Details are in the [provisioning draft](payment-provisioning-modes.md#wholesale-accounting-model).
 
 ## Decisions
 
@@ -99,8 +99,8 @@ Each enterprise uses one wholesale Clearinghouse allocation while provisioning i
 - The allocation key is a user-scoped vault secret on the enterprise app's authentication server. The client never receives it.
 - The gateway verifies that server's issuer and JWKS.
 - Standalone and enterprise modes share one actor context and one invocation path.
-- Payment granularity is one wholesale allocation per enterprise while the CLI is the only provisioner. Per-user limits belong to the gateway and the enterprise.
+- Payment granularity starts as one wholesale grant per enterprise. Per-user limits belong to the gateway and the enterprise.
 
 ## Work this design implies
 
-`netspe-cz5.2` publishes protected-resource and authentication-server metadata for PKCE public clients. `netspe-cz5.3` verifies the access token and drops it. `netspe-cz5.4` is the standalone gateway API-key adapter. `netspe-cz5.6` is the user-scoped vault resolver. `netspe-cz5.5` records JWKS verification inside Batteries as deferred work.
+`netspe-cz5.2` publishes protected-resource and authentication-server metadata for PKCE public clients. `netspe-cz5.3` verifies the access token and drops it. `netspe-cz5.4` is the standalone gateway API-key adapter. `netspe-cz5.6` is the user-scoped vault resolver. `netspe-cz5.5` records JWKS verification inside Batteries as deferred work. The other provider modes are tracked in the [provider modes draft](enterprise-auth-provider-modes.md#work-this-design-implies).
