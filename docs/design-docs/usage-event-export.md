@@ -59,4 +59,4 @@ OpenMeter can accept the canonical CloudEvent with a subject mapping. Lago and K
 
 ## Work this design implies
 
-`netspe-cz5.11` is the export-topic publish and waits on maintainer agreement, not on the admin HTTP server. `netspe-cz5.12` is the CloudEvent schema fixture. `netspe-cz5.13` is the OpenMeter HTTP ingest connector. `netspe-cz5.14` and `netspe-cz5.15` are the Lago and Kill Bill adapters.
+`netspe-cz5.11` is the export-topic publish and waits on maintainer agreement, not on the management API. `netspe-cz5.12` is the CloudEvent schema fixture. `netspe-cz5.13` is the OpenMeter HTTP ingest connector. `netspe-cz5.14` and `netspe-cz5.15` are the Lago and Kill Bill adapters.

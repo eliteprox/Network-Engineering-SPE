@@ -20,7 +20,10 @@ status is `Accepted` and it links to the decision that approved it.
 | [Enterprise authorization server](enterprise-authorization-server.md) | Draft for review | Pluggable issuer, public MCP OAuth, and a user-scoped vault for the allocation key |
 | [Usage event export](usage-event-export.md) | Draft for review | CloudEvents export topic and OpenMeter, Lago, and Kill Bill connectors |
 | [Clearinghouse configuration](clearinghouse-configuration.md) | Draft for review | Current serve flags and the optional usage export topic |
-| [Payment provisioning modes](payment-provisioning-modes.md) | Draft for review | Wholesale allocation per enterprise, CLI-seeded vault, external admin HTTP for programmatic fund |
+| [Payment provisioning modes](payment-provisioning-modes.md) | Draft for review | Wholesale grant per enterprise, vault-held allocation key, remaining provisioning gaps |
+| [Batteries management integration](batteries-management-integration.md) | Draft for review | `PaymentProvider` over the Batteries management API: single-tenant reseller, upstream asks, engine-side multi-tenancy |
+| [Enterprise authentication provider modes](enterprise-auth-provider-modes.md) | Draft for review | Provider chain; Basic, OIDC, MCP PKCE, CIMD catalog, device flow, audience token exchange and local gateway |
+| [simple-infra migration](simple-infra-builder-migration.md) | Draft for review | Second-application evidence register, seam and route map, phased move onto the engine |
 
 Intermediate Console-replacement and enterprise deployment drafts were removed
 on 23 September after consolidation. Original stakeholder evidence and its chronology remain in the
@@ -31,5 +34,8 @@ Historical `-draft` filenames remain for link stability. GitHub Project 13 track
 public milestones; Beads tracks internal work.
 The six integration drafts dated 25 September 2026 are review material for the
 gateway, MCP, authorization, usage export, Clearinghouse flags, and
-provisioning. Feature and story order lives in Beads under `netspe-cz5`. No draft
+provisioning. Feature and story order lives in Beads under `netspe-cz5`.
+The three drafts dated 1 October 2026 test the accepted engine against its
+neighbours: Batteries management, authentication modes, and the simple-infra
+migration. Their stories live under `netspe-scr`. No draft
 becomes accepted by being linked. Work state remains in Beads.
