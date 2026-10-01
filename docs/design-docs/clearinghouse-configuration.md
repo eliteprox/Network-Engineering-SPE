@@ -44,7 +44,7 @@ Funding idempotency is a separate maintainer ask. Today each fund operation mint
 
 ## Modes and flags
 
-Standalone, self-operated enterprise, and hosted payment deployments use this same flag set. The gateway's access-adapter mode, signer URL, and discovery URL are gateway configuration. The allocation key is a vault secret on the authorization server in enterprise mode, or gateway configuration in standalone mode. They are not Batteries flags.
+Standalone, self-operated enterprise, and hosted payment deployments use this same flag set. The gateway's access-adapter mode, signer URL, and discovery URL are gateway configuration. The allocation key is a vault secret on the enterprise app's authentication server in enterprise mode, or gateway configuration in standalone mode. They are not Batteries flags.
 
 Hard spending reservation, a public management HTTP API, and an outbox table are out of this flag change. Programmatic grant and allocation management waits on the maintainer's admin HTTP server and is not requested here. The export topic is the outbound path. Authorization continues to check a positive available balance and does not reserve the next ticket.
 

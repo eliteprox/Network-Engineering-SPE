@@ -4,13 +4,13 @@
 **Updated:** 25 September 2026
 **Context:** [Self-sovereign open builder stack](self-sovereign-open-builder-stack-draft.md), [capability matrix](console-capability-and-gap-matrix.md)
 
-This draft specifies the HTTP surface of a proposed `livepeer-python-gateway-server` package built on `livepeer/livepeer-python-gateway`. REST and MCP call the same core. The package holds the remote-signer URL and discovery URL. Caller credentials stop at the access adapter described in the [authorization draft](enterprise-authorization-server.md). The Clearinghouse allocation API key is never a field on public requests. Enterprise mode loads it from the authorization-server vault after the access token is verified. Standalone mode keeps it in server configuration.
+This draft specifies the HTTP surface of a proposed `livepeer-python-gateway-server` package built on `livepeer/livepeer-python-gateway`. REST and MCP call the same core. The package holds the remote-signer URL and discovery URL. Caller credentials stop at the access adapter described in the [authorization draft](enterprise-authorization-server.md). The Clearinghouse allocation API key is never a field on public requests. Enterprise mode loads it from the vault on the enterprise app's authentication server after the access token is verified. Standalone mode keeps it in server configuration.
 
 No Cloud SPE decision record accepts this contract yet.
 
 ## Execution path
 
-Job invocation uses the Live Runner interfaces in `livepeer-python-gateway`, including `call_runner` and the live session types. The server replaces the `@pymthouse/gateway-web` dependency used by the Console prototype. Discovery rates come from the signer and orchestrator evidence the SDK already reads.
+Job invocation uses the Live Runner interfaces in `livepeer-python-gateway`, including `call_runner` and the live session types. The server is the process boundary that replaces the Console prototype's hosted gateway package. Discovery rates come from the signer and orchestrator evidence the SDK already reads.
 
 [go-livepeer#4095](https://github.com/livepeer/go-livepeer/pull/4095) is open. It adds `price_usd` to remote discovery. Rate responses should carry that field when the signer revision includes it, and should omit it when the field is absent. A discovery rate is a published unit price with its source and freshness. It is a binding quote for a future job only when a later decision says so.
 
@@ -45,9 +45,9 @@ The Daydream SDK service can select a signer and a discovery URL from a per-key 
 ## Decisions
 
 - Capability identity in URLs is the query parameter `name`, because advertised names contain a slash.
-- Invocation is Live Runner through the Python SDK. The server package is the process boundary that replaces `gateway-web`.
+- Invocation is Live Runner through the Python SDK. The server package is the process boundary for Live Runner HTTP.
 - Persistent media has its own HTTP routes. Job polling stays on `GET /v1/jobs/{id}`.
-- The allocation API key is not a field on public requests. Enterprise mode resolves it from the authorization-server vault. Standalone mode keeps it in server configuration.
+- The allocation API key is not a field on public requests. Enterprise mode resolves it from the vault on the enterprise app's authentication server. Standalone mode keeps it in server configuration.
 
 ## Work this design implies
 

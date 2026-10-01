@@ -4,7 +4,7 @@
 **Updated:** 25 September 2026
 **Context:** [Enterprise authorization server](enterprise-authorization-server.md), [usage event export](usage-event-export.md), [architecture companion](open-builder-architecture-and-sequences.md#payment-operation-choices)
 
-This draft maps how much of the Clearinghouse grant model a deployment exposes. It uses the payment modes from the architecture companion and the access modes from the [authorization draft](enterprise-authorization-server.md). Those choices are independent: an enterprise authorization server can sit on a self-operated ledger or on a hosted payment operator.
+This draft maps how much of the Clearinghouse grant model a deployment exposes. It uses the payment modes from the architecture companion and the access modes from the [authorization draft](enterprise-authorization-server.md). Those choices are independent: the enterprise app's authentication server can sit on a self-operated ledger or on a hosted payment operator.
 
 No Cloud SPE decision record accepts this contract yet.
 
@@ -18,7 +18,7 @@ Public job routes do not create keys. Revocation stops later authorizations. Rot
 
 Grant, allocation, and key operations today are CLI commands. Fund operations are not caller-idempotent: each call inserts a new `fund:` ledger key.
 
-The Gateway/MCP authorization server stores the `lpg_` secret as a vault entry scoped to `sub`. The enterprise user row may store `allocation_id` so the operator can fund the same slice later. The client never receives the key. See the [authorization draft](enterprise-authorization-server.md#user-scoped-vault).
+The enterprise app's authentication server stores the `lpg_` secret as a vault entry scoped to `sub`. The enterprise user row may store `allocation_id` so the operator can fund the same slice later. The client never receives the key. See the [authorization draft](enterprise-authorization-server.md#user-scoped-vault).
 
 ## Wholesale accounting model
 
@@ -40,7 +40,7 @@ The operator uses the CLI: one grant, one allocation, one API key, installed in 
 
 ## Self-operated enterprise
 
-The enterprise operates its own Batteries and signer. One wholesale allocation per enterprise is provisioned with the CLI on the Batteries host, with `enterprise_id` set in allocation metadata at creation for the [usage export](usage-event-export.md). The operator installs the one-time allocation key in the authorization-server vault. End-user routes and MCP tools do not create, fund, or read allocations.
+The enterprise operates its own Batteries and signer. One wholesale allocation per enterprise is provisioned with the CLI on the Batteries host, with `enterprise_id` set in allocation metadata at creation for the [usage export](usage-event-export.md). The operator installs the one-time allocation key in the vault on the enterprise app's authentication server. End-user routes and MCP tools do not create, fund, or read allocations.
 
 ## Hosted enterprise
 
@@ -69,7 +69,7 @@ Product plans, checkout, invoices, customer credit, and markup are enterprise fe
 - Batteries is the wholesale network-credit ledger and signing authorizer. It stores no end-user records.
 - A grant is the customer budget. An allocation is a partition of that grant. Several keys can hang off one allocation.
 - Enterprise deployments use one wholesale allocation per enterprise while the CLI is the only provisioner, labelled with `enterprise_id`.
-- The enterprise application owns end users, per-user limits, attribution, and billing. It stores the allocation key in a user-scoped vault on the authorization server.
+- The enterprise application owns end users, per-user limits, attribution, and billing. It stores the allocation key in a user-scoped vault on the enterprise app's authentication server.
 - Standalone and self-operated provisioning is the CLI. Hosted provisioning is a key delivered once plus the export stream.
 - Programmatic allocation create, fund, and balance read wait on the maintainer's admin HTTP server.
 

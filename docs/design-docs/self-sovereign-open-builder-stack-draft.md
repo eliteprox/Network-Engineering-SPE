@@ -111,7 +111,7 @@ issuance, usage policy, abuse controls, availability and support responsibilitie
 A reference deployment demonstrates integration; it does not establish an ongoing
 public service. Neither Inc nor Mike Zupper is assigned that operation by this
 architecture or by the 24 September meeting.
-Neither mode requires PymtHouse, a proprietary identity provider, or commerce.
+Neither mode requires a proprietary identity or payment issuer, or commerce.
 Network, chain RPC and payment funding remain explicit dependencies.
 
 ## Repositories and application roles
@@ -189,9 +189,9 @@ Recommend operator-issued scoped API keys as the standalone REST/remote-MCP
 baseline, with opaque actor identifiers, revocation, ownership isolation and a
 separate administrator credential. Enterprise authentication supplies the same
 validated access context through a supported adapter, then loads the
-Clearinghouse allocation key from a user-scoped vault on the authorization
-server so MCP clients stay public OAuth clients. The contract is in the
-[authorization draft](enterprise-authorization-server.md). Google login and MCP
+Clearinghouse allocation key from a user-scoped vault on the enterprise app's
+authentication server so MCP clients stay public OAuth clients. The contract is
+in the [authorization draft](enterprise-authorization-server.md). Google login and MCP
 OAuth can be demonstrated in the example without becoming mandatory core identity
 infrastructure. This recommendation has not yet been explicitly selected by Mike.
 
@@ -210,7 +210,8 @@ allocations remain a contract decision; onboarding a customer need not create a
 provider account or allocation for that customer. The
 [provisioning draft](payment-provisioning-modes.md#wholesale-accounting-model)
 recommends one wholesale allocation per enterprise while the CLI is the only
-provisioner, with the allocation key held in the authorization-server vault.
+provisioner, with the allocation key held in the vault on the enterprise app's
+authentication server.
 
 ## Execution scope
 
@@ -283,7 +284,7 @@ The [accepted delivery plan](build-track-december-2026-task-breakdown-draft.md)
 defines M1–M5, with implementation delivery from October through December.
 Acceptance evidence should cover:
 
-- A pinned seven-outcome journey with no mandatory PymtHouse or commerce service.
+- A pinned seven-outcome journey with no mandatory hosted payment issuer or commerce service.
 - The pinned prototype execution baseline through the Python SDK, with representative success,
   failure, queued recovery and restart behavior.
 - The same core package release used by standalone and imported enterprise modes;
