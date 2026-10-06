@@ -633,7 +633,7 @@ The engine exports the counters the Enterprise App already defines for its Livep
 | Batteries read API | `GET /v1/cost/events?after=&limit=`, `GET /v1/cost/manifests/{manifest_id}` | `BatteriesProvider.cost_events`, `manifest_cost` |
 | Batteries management API | `POST /v1/grants`, `POST /v1/allocations`, `POST /v1/api-keys`, `POST /v1/allocations/{id}/fund`, `POST /v1/allocations/{id}/revoke`, `GET /v1/allocations/{id}` | `BatteriesProvider.provision`, `fund`, `revoke`, `allowance` |
 
-Three of these exist today only on the Enterprise App's forks: the SDK's multipart bodies, TLS flag, `payment_sent`, and stream manifest id; the Batteries manifest id and cost read API; and the signer's event delivery guarantee. The engine cannot depend on released upstream versions until they merge.
+Multipart bodies and the TLS flag are still only on the Enterprise App's SDK fork. `payment_sent`, the stream manifest id, failure classification, and `payment_sent` on rejections are in draft [livepeer-python-gateway#71](https://github.com/livepeer/livepeer-python-gateway/pull/71) (`5868d81` on `feat/call-runner-manifest-id`), rebased onto upstream `main` and not merged. Runner selection pool size and ordering remain [livepeer-python-gateway#70](https://github.com/livepeer/livepeer-python-gateway/issues/70). The Batteries manifest id and usage read are on `main` at `501c1ed`. The signer's event delivery guarantee is still open ([go-livepeer#4100](https://github.com/livepeer/go-livepeer/issues/4100)). The engine cannot depend on a released SDK for the unmerged fields.
 
 ## The Enterprise App on the new layer
 
