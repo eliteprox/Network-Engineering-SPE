@@ -1,7 +1,7 @@
 # Batteries Cost-Sync Adapter Interface
 
-**Date:** 6 October 2026\
-**Status:** Working draft for ISS-01 and ISS-02; source-verified, no runtime proof\
+**Date:** 6 October 2026  
+**Status:** Working draft for ISS-01 and ISS-02; source-verified, no runtime proof  
 **Bead:** `netspe-scr.29`
 
 ## Purpose and evidence limits
@@ -17,11 +17,13 @@ adapter, as set out in the
 
 Reviewed against source, not a running signer, Kafka and Batteries deployment:
 
-| Component | Revision | Where it stands |
-| --- | --- | --- |
-| [`livepeer/clearinghouse-batteries`](https://github.com/livepeer/clearinghouse-batteries) | `501c1ed` on `main` | Upstream. Usage attribution and the cursor are [#19](https://github.com/livepeer/clearinghouse-batteries/pull/19) `430b68a` and [#20](https://github.com/livepeer/clearinghouse-batteries/pull/20) `e8842e2` |
-| go-livepeer | `773734d` (v0.9.3) | Upstream. `server/remote_signer.go` puts `manifest_id` on the `create_signed_ticket` event |
-| Python gateway SDK | `e729ecc` on `feat/call-runner-manifest-id` | Fork only. Still required so a streamed or failed paid call can report the manifest id it was charged under |
+
+| Component                                                                                 | Revision                                                                                                                                           | Where it stands                                                                                                                                                                                                                                                                                                                          |
+| ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `[livepeer/clearinghouse-batteries](https://github.com/livepeer/clearinghouse-batteries)` | `501c1ed` on `main`                                                                                                                                | Upstream. Usage attribution and the cursor are [#19](https://github.com/livepeer/clearinghouse-batteries/pull/19) `430b68a` and [#20](https://github.com/livepeer/clearinghouse-batteries/pull/20) `e8842e2`                                                                                                                             |
+| go-livepeer                                                                               | `773734d` (v0.9.3)                                                                                                                                 | Upstream. `server/remote_signer.go` puts `manifest_id` on the `create_signed_ticket` event                                                                                                                                                                                                                                               |
+| Python gateway SDK                                                                        | `[5868d81](https://github.com/livepeer/livepeer-python-gateway/commit/5868d81d5bfcad305af96c57c679acee79e07edb)` on `feat/call-runner-manifest-id` | Draft [livepeer-python-gateway#71](https://github.com/livepeer/livepeer-python-gateway/pull/71) against upstream `main`. Not merged. A streamed or failed paid call reports the manifest id it was charged under. Errors and runner rejections carry `payment_sent`, and a rejection is classified `capacity`, `unreachable`, or `other` |
+
 
 `go test ./...` passed at `501c1ed` on 6 October 2026. That is source evidence.
 It is not an end-to-end proof that a ticket becomes a usage row.
@@ -130,22 +132,22 @@ is constructed with one `UsageSource`, one `CostSyncStore`, and the filter set
 that source was built with. The mocked enterprise gateway uses an empty filter
 set.
 
-## Behaviour
+## Behavior
 
 1. Read the checkpoint. If it is missing, or its `filters` differ from the
-   worker's filter set, start with `resume_cursor = None`.
+  worker's filter set, start with `resume_cursor = None`.
 2. Fetch a page with that cursor. If Batteries returns `400` because the cursor
-   does not match, clear the checkpoint and fetch once more from the start.
+  does not match, clear the checkpoint and fetch once more from the start.
    Any other error leaves the checkpoint unchanged.
 3. Choose the checkpoint to store with the page. If `next_cursor` is nonempty,
-   store that value: the next poll continues forward. If `next_cursor` is
+  store that value: the next poll continues forward. If `next_cursor` is
    empty, store the cursor that fetched this page, so the next poll re-reads
    the last page. A first page that is also the last page stores `None`.
 4. Upsert the rows and that checkpoint in one transaction. A crash after the
-   fetch and before the commit leaves the previous checkpoint, and the next
+  fetch and before the commit leaves the previous checkpoint, and the next
    `sync_once` fetches the same page again.
 5. Stop when `next_cursor` is empty. Otherwise repeat from step 2 with
-   `next_cursor`.
+  `next_cursor`.
 
 The store keeps every status. Only `applied` rows are observed cost. A
 `quarantined` row with no session is still stored; it must not become a zero
@@ -164,31 +166,35 @@ the previous last page. Rows already stored are dropped by the upsert.
 checkpoint. The suite covers:
 
 - A last page with `next_cursor == ""`, a second `sync_once`, and no duplicate
-  rows counted as new.
+rows counted as new.
 - A new row arriving after that second poll, picked up by re-reading the last
-  page.
+page.
 - A `quarantined` row with null `allocation_id` and `manifest_id`, stored and
-  excluded from observed cost.
+excluded from observed cost.
 - A `400` cursor mismatch, which clears the checkpoint and syncs from the start.
 - A crash after a page is fetched and before `apply` commits: the next
-  `sync_once` fetches that page again and `rows_new` is zero for the rows
-  already stored.
+`sync_once` fetches that page again and `rows_new` is zero for the rows
+already stored.
+
+
 
 ## Decisions
 
 - Sync the unfiltered usage list. Selection by allocation, manifest and status
-  happens in Postgres after the copy. A filtered Batteries query cannot see
-  rows that have no payment session, and its cursor cannot be reused if the
-  filter changes.
+happens in Postgres after the copy. A filtered Batteries query cannot see
+rows that have no payment session, and its cursor cannot be reused if the
+filter changes.
 - Treat an empty `next_cursor` as "re-read the last page", not as "forget the
-  cursor". The alternative, restarting from the beginning, is only acceptable
-  for a trivial history.
+cursor". The alternative, restarting from the beginning, is only acceptable
+for a trivial history.
 - Keep non-`applied` rows. Dropping them in the adapter would make a missing
-  fee look like a zero fee.
+fee look like a zero fee.
 - Key observed cost by `(allocation_id, manifest_id)`. One manifest can appear
-  on more than one allocation, and one job can have more than one applied row.
+on more than one allocation, and one job can have more than one applied row.
 - Leave signer delivery as a gap. A durable copy of `/v1/usage` cannot restore
-  an event go-livepeer dropped before Kafka.
+an event go-livepeer dropped before Kafka.
+
+
 
 ## Not in this interface
 
@@ -200,9 +206,10 @@ a different key from Batteries' `Idempotency-Key`.
 ## Implementation
 
 - `BatteriesUsageSource` and `CostSyncWorker` implement this contract over
-  `GET /v1/usage`. The Postgres `CostSyncStore` is the store adapter named in
-  the management integration design.
+`GET /v1/usage`. The Postgres `CostSyncStore` is the store adapter named in
+the management integration design.
 - `netspe-cz5.16` is the `BatteriesProvider` client. This sync is the cost half
-  of that client.
+of that client.
 - `netspe-scr.14` records the maintainer disposition for the usage route.
-  `netspe-scr.8` stays open.
+`netspe-scr.8` stays open.
+
