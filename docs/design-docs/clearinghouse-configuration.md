@@ -1,7 +1,7 @@
 # Clearinghouse Configuration
 
 **Status:** Draft for review
-**Updated:** 1 October 2026
+**Updated:** 6 October 2026
 **Context:** [Usage event export](usage-event-export.md), [provisioning modes](payment-provisioning-modes.md), [Batteries management integration](batteries-management-integration.md)
 
 Clearinghouse Batteries configures payment operation. It does not configure enterprise login. The flags below are the `serve` surface on Batteries `main` at `9cf68d6`, reviewed 1 October 2026. The export topic is the only addition this set of drafts asks for, and it needs maintainer agreement before it is implemented.
@@ -29,7 +29,7 @@ Configuration precedence is flags, then environment, then the configuration file
 
 The webhook and management API stay on loopback unless a TLS proxy terminates in front of them, matching Batteries `SECURITY.md`. Kafka stays on a trusted network. Plaintext broker connections are an operator concern, not an enterprise API.
 
-Grants, allocations, keys, sessions, usage, ledger, settlement, and escrow are managed with the CLI or the management HTTP API. The [management integration draft](batteries-management-integration.md) maps those routes to the engine. Neither is part of the export-topic ask. `usage list` and `GET /v1/usage` return id, event id, topic, offset, status, error, fee, and created time. Pipeline, request id, session, billable seconds, and pixels stay in the table and are omitted from that CLI view. Enterprises use the export topic in the [usage draft](usage-event-export.md) rather than polling this database, the CLI or the usage route.
+Grants, allocations, keys, sessions, usage, ledger, settlement, and escrow are managed with the CLI or the management HTTP API. The [management integration draft](batteries-management-integration.md) maps those routes to the engine. Neither is part of the export-topic ask. `usage list` and `GET /v1/usage` return a page of id, event id, topic, offset, status, error, fees, created time, payment session, request id, pipeline, manifest id, and allocation id. Billable seconds and pixels stay in the table and are omitted from that view. The engine copies `GET /v1/usage` through the [cost-sync adapter](../references/analysis/2026-10-06-Batteries-Cost-Sync-Adapter-Interface.md). The export topic in the [usage draft](usage-event-export.md) remains an optional push path. Enterprises do not poll `clearinghouse.db`.
 
 ## Export topic
 
@@ -41,7 +41,7 @@ When the maintainer accepts the export, `serve` gains one optional flag:
 
 Unset, Batteries behaves as it does today: ingest, ledger, and no outbound usage publish. Set, each applied `create_signed_ticket` is also published to that topic as a CloudEvent. The flag uses the same broker as accounting (`--enable-kafka` or `--kafka-broker`). It does not open a second cluster and it does not add an enterprise identity provider, a retail price, or a billing-vendor URL.
 
-Funding idempotency is a separate maintainer ask, tracked as `netspe-scr.12`. Today each fund operation, from the CLI or the management API, mints a new ledger idempotency key (`fund:` plus a fresh id), so a retried fund posts twice. Caller-supplied funding idempotency is part of the [open provisioning gap](payment-provisioning-modes.md#remaining-gaps-in-provisioning-and-funding) and is left to that later design. This draft does not add a fund-idempotency flag.
+Management API funding accepts `Idempotency-Key` (Batteries [#9](https://github.com/livepeer/clearinghouse-batteries/pull/9); `netspe-scr.12` is closed). The CLI still mints a fresh ledger key (`fund:` plus a new id), so a retried CLI fund posts twice. This draft does not add a fund-idempotency flag. The remaining provisioning limits are in the [provisioning draft](payment-provisioning-modes.md#remaining-gaps-in-provisioning-and-funding).
 
 ## Modes and flags
 

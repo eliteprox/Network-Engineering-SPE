@@ -21,7 +21,7 @@ status is `Accepted` and it links to the decision that approved it.
 | [Usage event export](usage-event-export.md) | Draft for review | CloudEvents export topic and OpenMeter, Lago, and Kill Bill connectors |
 | [Clearinghouse configuration](clearinghouse-configuration.md) | Draft for review | Current serve flags and the optional usage export topic |
 | [Payment provisioning modes](payment-provisioning-modes.md) | Draft for review | Wholesale grant per enterprise, vault-held allocation key, remaining provisioning gaps |
-| [Batteries management integration](batteries-management-integration.md) | Draft for review | `PaymentProvider` over the Batteries management API: single-tenant reseller, upstream asks, engine-side multi-tenancy |
+| [Batteries management integration](batteries-management-integration.md) | Draft for review | `PaymentProvider` over the Batteries management API: single-tenant reseller, delivered idempotency and usage reads, engine-side multi-tenancy |
 | [Enterprise authentication provider modes](enterprise-auth-provider-modes.md) | Draft for review | Provider chain; Basic, OIDC, MCP PKCE, CIMD catalog, device flow, audience token exchange and local gateway |
 | [simple-infra migration](simple-infra-builder-migration.md) | Draft for review | Second-application evidence register, seam and route map, phased move onto the engine |
 

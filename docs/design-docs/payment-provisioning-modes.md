@@ -1,7 +1,7 @@
 # Payment Provisioning Modes
 
 **Status:** Draft for review
-**Updated:** 1 October 2026
+**Updated:** 6 October 2026
 **Context:** [Enterprise authorization server](enterprise-authorization-server.md), [Batteries management integration](batteries-management-integration.md), [usage event export](usage-event-export.md), [architecture companion](open-builder-architecture-and-sequences.md#payment-operation-choices)
 
 This draft maps how much of the Clearinghouse grant model a deployment exposes. It uses the payment modes from the architecture companion and the access modes from the [authorization draft](enterprise-authorization-server.md). Those choices are independent: the enterprise app's authentication server can sit on a self-operated ledger or on a hosted payment operator.
@@ -16,7 +16,7 @@ A grant is the customer budget. Batteries was originally designed for community 
 
 Public job routes do not create keys. Revocation stops later authorizations. Rotating or revoking the key ends payment sessions bound to it; the gateway must load the replacement key. Tickets already signed can still arrive and post. Creating or funding an allocation does not fund signer escrow. Escrow funding stays an operator action on the signer wallet.
 
-Grant, allocation, and key operations are CLI commands and, since Batteries `a2ed175`, management HTTP routes under a scoped service credential. Neither path is caller-idempotent: each fund inserts a new `fund:` ledger key, and each create mints a new id.
+Grant, allocation, and key operations are CLI commands and, since Batteries `a2ed175`, management HTTP routes under a service credential. The CLI is not caller-idempotent: each fund inserts a new `fund:` ledger key, and each create mints a new id. On the management API, allocation creation, API-key creation, and grant and allocation funding accept `Idempotency-Key` (Batteries [#9](https://github.com/livepeer/clearinghouse-batteries/pull/9)). Grant creation does not. A matching retry replays the original success, including the API-key secret. A reused key with a different body returns `409`.
 
 The enterprise app's authentication server stores the `lpg_` secret as a vault entry scoped to `sub`. The enterprise user row may store `allocation_id` so the operator can fund the same slice later. The client never receives the key. See the [authorization draft](enterprise-authorization-server.md#user-scoped-vault).
 
@@ -48,15 +48,13 @@ A payment operator runs Batteries and the signer for several enterprises. Each e
 
 ## Remaining gaps in provisioning and funding
 
-Programmatic create, fund, and revoke exist on the Batteries management API. The [management integration draft](batteries-management-integration.md) maps them to the engine's `PaymentProvider`. Cloud SPE does not build that server. These behaviours remain open:
+Programmatic create, fund, and revoke exist on the Batteries management API. The [management integration draft](batteries-management-integration.md) maps them to the engine's `PaymentProvider`. Cloud SPE does not build that server. Caller idempotency, per-allocation balance, and attributed usage were delivered on Batteries `main` at `501c1ed`. These behaviours remain open:
 
-- A retried fund posts twice, and a retried create makes a second allocation. The engine journals each step and reconciles before any retry until the maintainer adds caller idempotency.
-- `GET /v1/allocations/{id}` reports cumulative allocated units, not the remaining balance. The engine reads `allocation_available` from the ledger report and filters it client-side.
-- `/v1/usage` cannot attribute an event to an allocation or `manifest_id`. Per-job cost still comes from the [export topic](usage-event-export.md).
+- The CLI still posts a retried fund twice. Management API retries are safe only when the engine resends the same `Idempotency-Key` and the same fields. Keys are shared by every caller of the grant, so the engine namespaces its own.
 - Management credentials are global and loaded from a static file, so a tenant cannot be given its own scoped credential.
 - `enterprise_id` can be set only when an allocation is created. Changing it means a new allocation and key, a vault key change, and ended sessions.
 
-The first Cloud SPE client of that API stores the one-time key in the vault entry for `sub` and reads remaining balance. It closes most of requirement A3 in the [capability matrix](console-capability-and-gap-matrix.md) ("authenticated, retry-safe provisioning"). Retry safety is complete only when upstream idempotency lands.
+The first Cloud SPE client of that API stores the key in the vault entry for `sub`. A lost create response can be replayed, including the secret. It reads remaining balance from `GET /v1/allocations/{id}` (`available_usd` or `available_eth`). Per-job cost is pulled through the [cost-sync adapter](../references/analysis/2026-10-06-Batteries-Cost-Sync-Adapter-Interface.md). The [export topic](usage-event-export.md) stays an optional push path.
 
 A later design may add a payment-processor integration: the enterprise pays through a processor, and a service turns confirmed payments into allocation funding through that same admin API.
 
@@ -72,8 +70,8 @@ Product plans, checkout, invoices, customer credit, and markup are enterprise fe
 - Enterprise deployments start with one wholesale grant per enterprise, labelled with `enterprise_id`, with allocations provisioned through the management API.
 - The enterprise application owns end users, per-user limits, attribution, and billing. It stores the allocation key in a user-scoped vault on the enterprise app's authentication server.
 - Standalone and self-operated provisioning is the management API or the CLI. Hosted provisioning is a key delivered once plus the export stream.
-- Programmatic allocation create and fund use the management API. Caller idempotency, a per-allocation balance and attributed usage are upstream asks.
+- Programmatic allocation create and fund use the management API, with grant-scoped `Idempotency-Key` retries. Allowance comes from the allocation read. Per-job cost comes from the usage pull.
 
 ## Work this design implies
 
-`netspe-cz5.6` is the vault resolver, seeded by the management API or the CLI. `netspe-cz5.1` is closed: the management API is on Batteries `main`. `netspe-cz5.16` is the first Cloud SPE client of that API. The upstream asks are `netspe-scr.12` to `netspe-scr.14`.
+`netspe-cz5.6` is the vault resolver, seeded by the management API or the CLI. `netspe-cz5.1` is closed: the management API is on Batteries `main`. `netspe-cz5.16` is the first Cloud SPE client of that API. `netspe-scr.12`, `netspe-scr.13` and `netspe-scr.14` are closed: the maintainer delivered those three asks at `501c1ed`.
